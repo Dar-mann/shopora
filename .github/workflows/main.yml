@@ -30,19 +30,39 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Install dependencies and build React Vite app
+      - name: Point all frontend API calls to Render and build
         env:
           CI: false
+          VITE_API_URL: "https://shopora-gi8x.onrender.com"
+          VITE_BACKEND_URL: "https://shopora-gi8x.onrender.com"
+          VITE_API_BASE_URL: "https://shopora-gi8x.onrender.com"
         run: |
+          # Replace any hardcoded localhost:8001 or localhost:8000 in src/ with your live Render URL
+          find src -type f \( -name "*.ts" -o -name "*.tsx" \) -exec sed -i 's|http://localhost:8001|https://shopora-gi8x.onrender.com|g' {} +
+          find src -type f \( -name "*.ts" -o -name "*.tsx" \) -exec sed -i 's|http://127.0.0.1:8001|https://shopora-gi8x.onrender.com|g' {} +
+          find src -type f \( -name "*.ts" -o -name "*.tsx" \) -exec sed -i 's|http://localhost:8000|https://shopora-gi8x.onrender.com|g' {} +
+
           npm ci
           npm run build || npx vite build
 
-      - name: Wrap frontend/dist with Capacitor
+      - name: Wrap frontend/dist with Capacitor + Native HTTP
         run: |
           npm install @capacitor/core @capacitor/cli @capacitor/android --legacy-peer-deps
-          if [ ! -f capacitor.config.json ] && [ ! -f capacitor.config.ts ]; then
-            npx cap init "Shopora" "com.shopora.app" --web-dir dist
-          fi
+          cat << 'EOF' > capacitor.config.json
+          {
+            "appId": "com.shopora.app",
+            "appName": "Shopora",
+            "webDir": "dist",
+            "server": {
+              "androidScheme": "https"
+            },
+            "plugins": {
+              "CapacitorHttp": {
+                "enabled": true
+              }
+            }
+          }
+          EOF
           if [ ! -d android ]; then
             npx cap add android
           fi
