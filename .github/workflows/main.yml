@@ -1,0 +1,64 @@
+name: Build Shopora Android APK
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+
+    # Run all Node/Capacitor commands inside your frontend subfolder
+    defaults:
+      run:
+        working-directory: ./frontend
+
+    steps:
+      - name: Checkout Shopora repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Set up Java 21 for Android
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+
+      - name: Install dependencies and build React Vite app
+        # Optional: Add VITE_API_URL in GitHub Settings -> Secrets/Variables if api.ts uses it
+        env:
+          CI: false
+        run: |
+          npm ci
+          npm run build
+
+      - name: Wrap frontend/dist with Capacitor
+        run: |
+          npm install @capacitor/core @capacitor/cli @capacitor/android
+          if [ ! -f capacitor.config.json ] && [ ! -f capacitor.config.ts ]; then
+            npx cap init "Shopora" "com.shopora.app" --web-dir dist
+          fi
+          if [ ! -d android ]; then
+            npx cap add android
+          fi
+          npx cap sync android
+
+      - name: Compile Shopora Android APK
+        working-directory: ./frontend/android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Upload Shopora APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Shopora-Android-APK
+          path: frontend/android/app/build/outputs/apk/debug/app-debug.apk
