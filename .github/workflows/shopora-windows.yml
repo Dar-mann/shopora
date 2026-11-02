@@ -22,7 +22,7 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Build frontend with Render Backend URL
+      - name: Build frontend for Windows
         shell: bash
         env:
           CI: false
@@ -31,6 +31,12 @@ jobs:
           VITE_API_BASE_URL: "https://shopora-backend-ng.onrender.com"
         run: |
           npm install --no-audit --no-fund
+          
+          # Ensure Vite uses relative paths for desktop compatibility
+          if [ -f vite.config.ts ]; then
+            sed -i "s/defineConfig({/defineConfig({ base: '.\/',/g" vite.config.ts
+          fi
+          
           npm run build || npx vite build
 
       - name: Inject Electron Desktop Wrapper
@@ -38,7 +44,6 @@ jobs:
         run: |
           npm install electron electron-builder --save-dev
           
-          # Create the desktop window controller
           cat << 'EOF' > main.js
           const { app, BrowserWindow } = require('electron');
           const path = require('path');
@@ -57,13 +62,11 @@ jobs:
           }
           
           app.whenReady().then(createWindow);
-          
           app.on('window-all-closed', () => {
             if (process.platform !== 'darwin') app.quit();
           });
           EOF
           
-          # Create the executable compiler configuration
           cat << 'EOF' > electron-builder.json
           {
             "appId": "com.shopora.desktop",
@@ -91,4 +94,3 @@ jobs:
         with:
           name: Shopora-Windows-App
           path: frontend/release/*.exe
-
