@@ -30,22 +30,25 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Point all frontend API calls to Render and build
+      - name: Point frontend API calls to shopora-backend-ng and build
         env:
           CI: false
-          VITE_API_URL: "https://shopora-gi8x.onrender.com"
-          VITE_BACKEND_URL: "https://shopora-gi8x.onrender.com"
-          VITE_API_BASE_URL: "https://shopora-gi8x.onrender.com"
+          BACKEND_URL: "https://shopora-backend-ng.onrender.com"
         run: |
-          # Replace any hardcoded localhost:8001 or localhost:8000 in src/ with your live Render URL
-          find src -type f \( -name "*.ts" -o -name "*.tsx" \) -exec sed -i 's|http://localhost:8001|https://shopora-gi8x.onrender.com|g' {} +
-          find src -type f \( -name "*.ts" -o -name "*.tsx" \) -exec sed -i 's|http://127.0.0.1:8001|https://shopora-gi8x.onrender.com|g' {} +
-          find src -type f \( -name "*.ts" -o -name "*.tsx" \) -exec sed -i 's|http://localhost:8000|https://shopora-gi8x.onrender.com|g' {} +
+          export VITE_API_URL="$BACKEND_URL"
+          export VITE_BACKEND_URL="$BACKEND_URL"
+          export VITE_API_BASE_URL="$BACKEND_URL"
+
+          # Replace any old localhost or frontend static site URLs with your true Python backend
+          find src -type f \( -name "*.ts" -o -name "*.tsx" \) -exec sed -i "s|http://localhost:8001|$BACKEND_URL|g" {} +
+          find src -type f \( -name "*.ts" -o -name "*.tsx" \) -exec sed -i "s|http://127.0.0.1:8001|$BACKEND_URL|g" {} +
+          find src -type f \( -name "*.ts" -o -name "*.tsx" \) -exec sed -i "s|http://localhost:8000|$BACKEND_URL|g" {} +
+          find src -type f \( -name "*.ts" -o -name "*.tsx" \) -exec sed -i "s|https://shopora-gi8x.onrender.com|$BACKEND_URL|g" {} +
 
           npm ci
           npm run build || npx vite build
 
-      - name: Wrap frontend/dist with Capacitor + Native HTTP
+      - name: Wrap frontend/dist with Capacitor
         run: |
           npm install @capacitor/core @capacitor/cli @capacitor/android --legacy-peer-deps
           cat << 'EOF' > capacitor.config.json
@@ -55,11 +58,6 @@ jobs:
             "webDir": "dist",
             "server": {
               "androidScheme": "https"
-            },
-            "plugins": {
-              "CapacitorHttp": {
-                "enabled": true
-              }
             }
           }
           EOF
