@@ -116,10 +116,10 @@ function SellerPage() {
       }
 
       window.location.href = '/seller/dashboard'
-    } catch (err) {
+    } } catch (err) {
       if (err instanceof TypeError) {
         setError(
-          'Cannot connect to the backend. Make sure the server is running on port 8001.',
+          'Cannot connect to the backend. Please check your internet connection.',
         )
       } else {
         setError(
