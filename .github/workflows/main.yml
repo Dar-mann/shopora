@@ -30,7 +30,7 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Automatically clean local ports and build
+      - name: Point API calls to Render and clean error messages
         env:
           CI: false
           BACKEND_URL: "https://shopora-backend-ng.onrender.com"
@@ -39,14 +39,13 @@ jobs:
           export VITE_BACKEND_URL="$BACKEND_URL"
           export VITE_API_BASE_URL="$BACKEND_URL"
 
-          # Automatically find and replace any mention of port 8001 or localhost in all source files
+          # Safely replace localhost URLs with your Render backend URL
           find src -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" \) -exec sed -i "s|http://localhost:8001|$BACKEND_URL|g" {} +
           find src -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" \) -exec sed -i "s|http://127.0.0.1:8001|$BACKEND_URL|g" {} +
           find src -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" \) -exec sed -i "s|localhost:8001|$BACKEND_URL|g" {} +
-          find src -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" \) -exec sed -i "s|8001|$BACKEND_URL|g" {} +
-          
-          # Replace the specific error string so it doesn't show up in the APK
-          find src -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" \) -exec sed -i 's|Make sure the server is running on port 8001|Connecting to server...|g' {} +
+
+          # Clean up the awkward port error message so it reads professionally
+          find src -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" \) -exec sed -i 's|Make sure the server is running on port [^[:cntrl:]]*|Cannot connect to the backend. Please check your internet connection.|g' {} +
 
           npm ci
           npm run build || npx vite build
