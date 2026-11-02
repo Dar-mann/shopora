@@ -21,7 +21,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          # Removed automatic cache: 'npm' to prevent cache-locking hangups
 
       - name: Set up Java 21 for Android
         uses: actions/setup-java@v4
@@ -46,12 +45,12 @@ jobs:
           VITE_BACKEND_URL: "https://shopora-backend-ng.onrender.com"
           VITE_API_BASE_URL: "https://shopora-backend-ng.onrender.com"
         run: |
-          npm ci
+          npm install --no-audit --no-fund
           npm run build || npx vite build
 
       - name: Wrap frontend/dist with Capacitor
         run: |
-          npm install @capacitor/core @capacitor/cli @capacitor/android --legacy-peer-deps
+          npm install @capacitor/core @capacitor/cli @capacitor/android --legacy-peer-deps --no-audit --no-fund
           cat << 'EOF' > capacitor.config.json
           {
             "appId": "com.shopora.app",
