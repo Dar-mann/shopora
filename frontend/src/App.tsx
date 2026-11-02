@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { API_URL } from './api'
 
 type Product = {
@@ -64,6 +65,7 @@ function productImage(category: string) {
 }
 
 function App() {
+  const navigate = useNavigate()
   const [products, setProducts] = useState<Product[]>([])
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('All')
@@ -319,7 +321,7 @@ function App() {
   }
 
   function goToSeller() {
-    window.location.href = '/seller'
+    navigate('/seller')
   }
 
   const accountModal = accountOpen ? (
@@ -593,6 +595,7 @@ function App() {
                 onClick={() => {
                   addToCart(selectedProduct, detailQuantity)
                   setSelectedProduct(null)
+                  setDetailQuantity(1)
                   setCartOpen(true)
                 }}
                 className="mt-6 w-full rounded-xl bg-orange-600 px-5 py-4 font-bold text-white hover:bg-orange-700 disabled:bg-stone-300"
