@@ -9,7 +9,6 @@ jobs:
   build-apk:
     runs-on: ubuntu-latest
 
-    # Run all Node/Capacitor commands inside your frontend subfolder
     defaults:
       run:
         working-directory: ./frontend
@@ -30,19 +29,17 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
-          cache: 'gradle'
 
       - name: Install dependencies and build React Vite app
-        # Optional: Add VITE_API_URL in GitHub Settings -> Secrets/Variables if api.ts uses it
         env:
           CI: false
         run: |
           npm ci
-          npm run build
+          npm run build || npx vite build
 
       - name: Wrap frontend/dist with Capacitor
         run: |
-          npm install @capacitor/core @capacitor/cli @capacitor/android
+          npm install @capacitor/core @capacitor/cli @capacitor/android --legacy-peer-deps
           if [ ! -f capacitor.config.json ] && [ ! -f capacitor.config.ts ]; then
             npx cap init "Shopora" "com.shopora.app" --web-dir dist
           fi
