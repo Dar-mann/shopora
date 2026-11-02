@@ -44,7 +44,8 @@ jobs:
         run: |
           npm install electron electron-builder --save-dev
           
-          cat << 'EOF' > main.js
+          # Use .cjs extension to fix the ES Module require error
+          cat << 'EOF' > main.cjs
           const { app, BrowserWindow } = require('electron');
           const path = require('path');
           
@@ -79,7 +80,7 @@ jobs:
             },
             "files": [
               "dist/**/*",
-              "main.js"
+              "main.cjs"
             ]
           }
           EOF
@@ -87,7 +88,7 @@ jobs:
       - name: Compile Windows EXE
         shell: bash
         run: |
-          npx electron-builder --win --config electron-builder.json -c.extraMetadata.main=main.js
+          npx electron-builder --win --config electron-builder.json -c.extraMetadata.main=main.cjs
 
       - name: Upload Shopora Windows Installer
         uses: actions/upload-artifact@v4
