@@ -30,10 +30,9 @@ jobs:
           VITE_BACKEND_URL: "https://shopora-backend-ng.onrender.com"
           VITE_API_BASE_URL: "https://shopora-backend-ng.onrender.com"
         run: |
-          npm install --no-audit --no-fund
-          
-          # This line fixes the exit code 1 / TS2307 error
-          npm install react-router-dom --no-audit --no-fund
+          # Disable progress bar to prevent Windows runner freezing
+          npm config set progress false
+          npm install --no-audit --no-fund --loglevel=error
           
           if [ -f vite.config.ts ]; then
             sed -i "s/defineConfig({/defineConfig({ base: '.\/',/g" vite.config.ts
@@ -44,7 +43,8 @@ jobs:
       - name: Inject Electron Desktop Wrapper
         shell: bash
         run: |
-          npm install electron electron-builder --save-dev
+          # Install Electron quietly to prevent network/console hang
+          npm install electron electron-builder --save-dev --no-audit --no-fund --loglevel=error
           
           cat << 'EOF' > main.cjs
           const { app, BrowserWindow } = require('electron');
@@ -97,4 +97,3 @@ jobs:
         with:
           name: Shopora-Windows-App
           path: frontend/release/*.exe
-
