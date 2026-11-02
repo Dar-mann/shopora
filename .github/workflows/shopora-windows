@@ -91,3 +91,4 @@ jobs:
         with:
           name: Shopora-Windows-App
           path: frontend/release/*.exe
+
