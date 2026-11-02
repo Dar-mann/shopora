@@ -116,7 +116,7 @@ function SellerPage() {
       }
 
       window.location.href = '/seller/dashboard'
-    } } catch (err) {
+    } catch (err) {
       if (err instanceof TypeError) {
         setError(
           'Cannot connect to the backend. Please check your internet connection.',
