@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { API_URL } from './api'
 
 type Product = {
@@ -53,6 +54,7 @@ function productImage(category: string) {
 }
 
 function App() {
+  const navigate = useNavigate()
   const [products, setProducts] = useState<Product[]>([])
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('All')
@@ -347,7 +349,7 @@ function App() {
           <button
             type="button"
             onClick={() => {
-              window.location.href = '/seller'
+              navigate('/seller')
             }}
             className="ml-auto rounded-full border border-[#a85327] px-3 py-2.5 text-xs font-bold text-[#8e421f] transition hover:bg-[#f4e7d8] sm:ml-0 sm:px-5 sm:py-3 sm:text-sm"
           >
@@ -428,7 +430,7 @@ function App() {
                 <button
                   type="button"
                   onClick={() => {
-                    window.location.href = '/seller'
+                    navigate('/seller')
                   }}
                   className="rounded-full border border-white/40 bg-white/10 px-7 py-4 text-sm font-bold text-white backdrop-blur-sm transition hover:bg-white/20"
                 >
@@ -779,7 +781,7 @@ function App() {
             <button
               type="button"
               onClick={() => {
-                window.location.href = '/seller'
+                navigate('/seller')
               }}
               className="rounded-2xl bg-orange-100 p-7 text-left transition hover:-translate-y-1 hover:bg-orange-200 md:p-10"
             >
