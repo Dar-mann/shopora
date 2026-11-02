@@ -22,7 +22,7 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Build frontend for Windows
+      - name: Clean repo and Build frontend
         shell: bash
         env:
           CI: false
@@ -30,10 +30,15 @@ jobs:
           VITE_BACKEND_URL: "https://shopora-backend-ng.onrender.com"
           VITE_API_BASE_URL: "https://shopora-backend-ng.onrender.com"
         run: |
-          # Disable progress bar to prevent Windows runner freezing
+          # Force delete the broken backup file so TypeScript ignores it
+          rm -f src/"App copy.tsx" || true
+          
+          # Silence npm and install the missing router dependency directly
           npm config set progress false
+          npm install react-router-dom --no-audit --no-fund --loglevel=error
           npm install --no-audit --no-fund --loglevel=error
           
+          # Fix Vite paths for desktop
           if [ -f vite.config.ts ]; then
             sed -i "s/defineConfig({/defineConfig({ base: '.\/',/g" vite.config.ts
           fi
@@ -43,7 +48,6 @@ jobs:
       - name: Inject Electron Desktop Wrapper
         shell: bash
         run: |
-          # Install Electron quietly to prevent network/console hang
           npm install electron electron-builder --save-dev --no-audit --no-fund --loglevel=error
           
           cat << 'EOF' > main.cjs
