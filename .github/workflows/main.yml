@@ -66,6 +66,11 @@ jobs:
           if [ ! -d android ]; then
             npx cap add android
           fi
+          
+          # Inject memory settings to prevent Gradle from hanging
+          echo "org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8" >> android/gradle.properties
+          echo "org.gradle.daemon=true" >> android/gradle.properties
+          
           npx cap sync android
 
       - name: Compile Shopora Android APK
