@@ -30,7 +30,7 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Point frontend API calls to shopora-backend-ng and build
+      - name: Automatically clean local ports and build
         env:
           CI: false
           BACKEND_URL: "https://shopora-backend-ng.onrender.com"
@@ -39,11 +39,14 @@ jobs:
           export VITE_BACKEND_URL="$BACKEND_URL"
           export VITE_API_BASE_URL="$BACKEND_URL"
 
-          # Replace any old localhost or frontend static site URLs with your true Python backend
-          find src -type f \( -name "*.ts" -o -name "*.tsx" \) -exec sed -i "s|http://localhost:8001|$BACKEND_URL|g" {} +
-          find src -type f \( -name "*.ts" -o -name "*.tsx" \) -exec sed -i "s|http://127.0.0.1:8001|$BACKEND_URL|g" {} +
-          find src -type f \( -name "*.ts" -o -name "*.tsx" \) -exec sed -i "s|http://localhost:8000|$BACKEND_URL|g" {} +
-          find src -type f \( -name "*.ts" -o -name "*.tsx" \) -exec sed -i "s|https://shopora-gi8x.onrender.com|$BACKEND_URL|g" {} +
+          # Automatically find and replace any mention of port 8001 or localhost in all source files
+          find src -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" \) -exec sed -i "s|http://localhost:8001|$BACKEND_URL|g" {} +
+          find src -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" \) -exec sed -i "s|http://127.0.0.1:8001|$BACKEND_URL|g" {} +
+          find src -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" \) -exec sed -i "s|localhost:8001|$BACKEND_URL|g" {} +
+          find src -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" \) -exec sed -i "s|8001|$BACKEND_URL|g" {} +
+          
+          # Replace the specific error string so it doesn't show up in the APK
+          find src -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" \) -exec sed -i 's|Make sure the server is running on port 8001|Connecting to server...|g' {} +
 
           npm ci
           npm run build || npx vite build
