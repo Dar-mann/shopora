@@ -98,6 +98,7 @@ jobs:
 
       - name: Upload Shopora Windows Installer
         uses: actions/upload-artifact@v4
+        
         with:
           name: Shopora-Windows-App
           path: frontend/release/*.exe
