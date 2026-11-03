@@ -620,12 +620,12 @@ function App() {
 
       <header className="sticky top-0 z-30 border-b border-orange-100 bg-white shadow-sm">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-4 py-4 sm:flex-nowrap sm:gap-6">
-          <a
-            href="/"
-            className="text-3xl font-black tracking-tight text-orange-600"
+          <button
+            onClick={() => navigate('/')}
+            className="text-3xl font-black tracking-tight text-orange-600 text-left"
           >
             Shopora<span className="text-stone-900">.</span>
-          </a>
+          </button>
 
           <div className="order-3 flex w-full items-center rounded-full border border-stone-200 bg-stone-50 px-4 sm:order-none sm:flex-1">
             <span className="text-xl text-orange-600">⌕</span>
