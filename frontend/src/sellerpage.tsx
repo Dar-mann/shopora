@@ -1,9 +1,11 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { API_URL } from './api'
 
 type AuthMode = 'register' | 'login'
 
 function SellerPage() {
+  const navigate = useNavigate()
   const [mode, setMode] = useState<AuthMode>(() =>
     new URLSearchParams(window.location.search).get('mode') === 'login'
       ? 'login'
@@ -93,7 +95,7 @@ function SellerPage() {
         if (token) {
           localStorage.setItem('shopora_seller_token', token)
           localStorage.setItem('shopora_seller_name', name.trim())
-          window.location.href = '/seller/dashboard'
+          navigate('/seller/dashboard')
           return
         }
 
@@ -115,7 +117,7 @@ function SellerPage() {
         localStorage.setItem('shopora_seller_name', data.name)
       }
 
-      window.location.href = '/seller/dashboard'
+      navigate('/seller/dashboard')
     } catch (err) {
       if (err instanceof TypeError) {
         setError(
@@ -137,19 +139,19 @@ function SellerPage() {
     <div className="min-h-screen bg-stone-100 text-stone-900">
       <header className="border-b border-stone-200 bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 sm:px-8">
-          <a
-            href="/"
-            className="text-2xl font-black tracking-tight text-orange-600"
+          <button
+            onClick={() => navigate('/')}
+            className="text-2xl font-black tracking-tight text-orange-600 text-left"
           >
             Shopora<span className="text-stone-900">.</span>
-          </a>
+          </button>
 
-          <a
-            href="/"
+          <button
+            onClick={() => navigate('/')}
             className="text-sm font-semibold text-stone-600 hover:text-orange-600"
           >
             Back to shopping
-          </a>
+          </button>
         </div>
       </header>
 
